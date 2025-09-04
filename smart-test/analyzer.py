@@ -12,7 +12,8 @@ class FunctionInfo:
     module_rel: Path
     qualname: str
     lineno: int
-    hasTest: bool
+    has_tests: bool
+    covered: bool = False
 
 def _functions_in_ast(tree:ast.AST) -> List[Tuple[str, int]]:
     results: List[Tuple[str, int]] = []
@@ -67,3 +68,35 @@ def analyze_project(root: str | Path) -> List[FunctionInfo]:
                 has_tests=has_tests,
             ))
     return results
+
+def parse_coverage_xml(xml_path: str) -> dict:
+    tree = ET.parse(xml_path)
+    root = tree.getroot()
+    file_coverage = {}
+    for class_node in root.findall(".//class"):
+        filename = class_node.attrib["filename"]
+        covered_lines = set(
+            int(line.attrib["number"])
+            for line in class_node.findall("lines/line")
+            if int(line.attrib["hits"]) > 0
+        )
+        file_coverage[filename] = covered_lines
+    return file_coverage
+
+def map_coverage_to_functions(functions, file_coverage):
+    for fi in functions:
+        rel_path = str(fi.module_rel)
+        covered_lines = file_coverage.get(rel_path, set())
+        if fi.lineno in covered_lines:
+            object.__setattr__(fi, "covered", True)
+    return functions
+
+def summarize_coverage(functions):
+    need_tests = [fi for fi in functions if not fi.has_tests or not fi.covered]
+    priority_funcs = [fi.qualname for fi in need_tests[:3]]
+    low_coverage_files = {fi.module_rel for fi in functions if not fi.covered}
+    return {
+        "need_tests_count": len(need_tests),
+        "low_coverage_count": len(low_coverage_files),
+        "priority_functions": priority_funcs,
+    }

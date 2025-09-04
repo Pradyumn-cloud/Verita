@@ -6,7 +6,7 @@ PYTHON_GLOB = "*.py"
 def iter_python_files(root: str | Path) -> Iterable[Path]:
     base = Path(root)
     # Skip typical virtualenv/build dirs if desired later
-    return base.rglob(PYTHON_GLOB)  # recursive discovery [7][12]
+    return base.rglob(PYTHON_GLOB)
 
 def read_text(path: Path) -> str:
     # Robust read with UTF-8 default
