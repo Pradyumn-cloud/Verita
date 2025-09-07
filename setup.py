@@ -6,8 +6,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="smart-test",
     version="0.1.0",
-    author="Your Name",
-    author_email="your.email@example.com",
+    author="Prady",
+    author_email="pradyumnprasad.567@gmail.com",
     description="A tool for analyzing and generating tests for Python projects",
     long_description=long_description,
     long_description_content_type="text/markdown",
