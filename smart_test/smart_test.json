@@ -1,0 +1,13 @@
+{
+  "test_output_dir": "tests",
+  "exclude_patterns": [
+    "venv/**",
+    "build/**",
+    "dist/**"
+  ],
+  "include_private_methods": false,
+  "pytest_args": [
+    "-v"
+  ],
+  "coverage_path": "coverage.xml"
+}
