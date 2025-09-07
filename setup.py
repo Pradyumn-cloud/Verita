@@ -4,22 +4,19 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="smart_test",
+    name="smart-test",
     version="0.1.0",
     author="Your Name",
     author_email="your.email@example.com",
     description="A tool for analyzing and generating tests for Python projects",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/smart-test",
-    packages=find_packages(),
+    url="https://github.com/Pradyumn-cloud/VERITA",
+    packages=find_packages(exclude=["tests", "examples", "*.tests", "*.examples"]),
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-        "Development Status :: 3 - Alpha",
-        "Intended Audience :: Developers",
-        "Topic :: Software Development :: Testing",
     ],
     python_requires=">=3.7",
     install_requires=[
@@ -33,4 +30,7 @@ setup(
             "smart-test=smart_test.main:main",
         ],
     },
+    # Reduce test file discovery during installation
+    zip_safe=False,
+    include_package_data=False,
 )
