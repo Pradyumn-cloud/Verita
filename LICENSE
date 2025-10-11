@@ -1,35 +1,39 @@
-VERITA PROPRIETARY LICENSE
+Verita Personal and Educational License v1.0
+LicenseRef-Verita-PEL-1.0
 
-Copyright (c) 2025 Verita Project. All Rights Reserved.
+Copyright (c) 2025 Pradyumn-cloud. All rights reserved.
 
-EDUCATIONAL VIEWING LICENSE
+Grant
+Subject to this License, you are granted a limited, non-exclusive, non-transferable, revocable license to:
+1) View and read the source code.
+2) Run the Software and make local modifications solely for:
+   a) Personal, non-commercial use by you, and/or
+   b) Educational use (learning, teaching, or academic research) where no commercial advantage is intended or received.
 
-This license governs the use of the Verita software and associated documentation files (the "Software").
+Restrictions
+You may NOT:
+- Use the Software for any commercial, professional, production, internal business, or client work.
+- Host, provide, or offer the Software as a service (SaaS) or include it in any product.
+- Distribute, publish, sublicense, sell, rent, or lease the Software or any derivative works.
+- Share the Software or derivatives with others, including by posting to public repositories, package indexes, or forums.
+- Incorporate code, algorithms, or data from the Software into other projects beyond your personal or educational use.
+- Use the Software or its outputs to train, fine-tune, or evaluate AI/ML models.
+- Remove or alter copyright, license notices, or attribution.
+- Circumvent technical restrictions or security measures.
 
-PERMITTED ACTIVITIES:
-- Viewing the source code for educational and learning purposes only
-- Reading and studying the code structure and implementation
-- Academic research and analysis of the codebase
-- Classroom instruction and educational demonstrations
+Conditions
+- You must retain this License in all permitted copies.
+- Any permitted academic use must include proper attribution to “Verita” and the copyright holder.
+- This License does not grant trademark rights.
 
-PROHIBITED ACTIVITIES:
-- Running, executing, or deploying the Software in any environment
-- Using the Software for any commercial, personal, or professional purposes
-- Modifying, adapting, or creating derivative works
-- Distributing, sharing, or redistributing the Software or any portion thereof
-- Copying the Software for any purpose other than educational viewing
-- Reverse engineering for implementation purposes
-- Using any concepts, algorithms, or implementations from the Software in other projects
+Termination
+This License terminates automatically if you breach any term. Upon termination, you must cease use and delete all copies. The Licensor may grant written exceptions.
 
-CONDITIONS:
-1. This license notice must be included in all copies or portions of the Software
-2. The Software is provided for educational viewing only
-3. No warranties are provided - the Software is provided "AS IS"
-4. The copyright holder is not liable for any damages arising from viewing the Software
+No Warranty
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. USE AT YOUR OWN RISK.
 
-ENFORCEMENT:
-Unauthorized use of this Software beyond educational viewing is strictly prohibited and may result in legal action.
+Limitation of Liability
+IN NO EVENT WILL THE COPYRIGHT HOLDER BE LIABLE FOR ANY DAMAGES ARISING OUT OF USE, EVEN IF ADVISED OF THE POSSIBILITY.
 
-For licensing inquiries regarding commercial or practical use, contact: pradyumnprasad.567@gmail.com
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM VIEWING OR STUDYING THE SOFTWARE.
+Contact
+For commercial or other licensing, contact: pradyumnprasad.567@gmail.com
