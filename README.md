@@ -19,8 +19,7 @@
 ## 📸 Demo
 
 <!-- Add your screenshot/demo image here -->
-![Smart Test Generator Demo](docs/demo.png)
-*Screenshot: Smart Test Generator in action - analyzing code and generating comprehensive test suites*
+![Smart Test Generator Demo](logo.jpg)
 
 ---
 
