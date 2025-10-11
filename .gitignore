@@ -1,9 +1,8 @@
-# Python bytecode
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Distribution / packaging
+*.so
 .Python
 build/
 develop-eggs/
@@ -21,22 +20,28 @@ wheels/
 .installed.cfg
 *.egg
 
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment variables
+.env
+.env.local
+
 # Testing
 .pytest_cache/
 .coverage
 htmlcov/
 .tox/
-coverage.xml
-*.cover
-.hypothesis/
 
-# Virtual environments
-venv/
-env/
-ENV/
-
-# IDE-specific files
-.idea/
-.vscode/
-*.swp
-*.swo
+# OS
+.DS_Store
+Thumbs.db

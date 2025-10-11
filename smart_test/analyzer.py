@@ -1,240 +1,164 @@
-from __future__ import annotations
+"""Python code analyzer for test generation"""
 import ast
-import xml.etree.ElementTree as ET
-from dataclasses import dataclass
+from typing import List, Tuple
 from pathlib import Path
-from typing import Iterable, List, Tuple, Dict, Set, Optional
-from .utils import iter_python_files, read_text
+from .models import FunctionInfo, AnalysisResult
+from .utils import read_text
 
-@dataclass(frozen=True)
-class FunctionInfo:
-    file: Path
-    module_rel: Path
-    qualname: str
-    lineno: int
-    has_tests: bool
-    covered: bool = False
-
-def _functions_in_ast(tree: ast.AST) -> List[Tuple[str, int]]:
-    results: List[Tuple[str, int]] = []
-    for node in ast.walk(tree):
-        if isinstance(node, ast.FunctionDef):
-            # Get parent class if it exists
-            parent_class = None
-            for potential_parent in ast.walk(tree):
-                if isinstance(potential_parent, ast.ClassDef) and node in potential_parent.body:
-                    parent_class = potential_parent.name
-                    break
-            
-            if parent_class:
-                results.append((f"{parent_class}.{node.name}", node.lineno))
-            else:
-                results.append((node.name, node.lineno))
+class CodeAnalyzer:
+    """Analyzes Python source code to extract testable components"""
     
-    return results
-
-def _likely_test_files(root: Path) -> List[Path]:
-    """Find likely test files in the project."""
-    tests_dir = root / "tests"
-    patterns = ["test_*.py", "*_test.py"]
-    files: List[Path] = []
+    def __init__(self):
+        self.functions: List[FunctionInfo] = []
+        self.imports: List[str] = []
+        self.classes: List[str] = []
     
-    # Look in tests directory
-    if tests_dir.exists():
-        for pat in patterns:
-            files.extend(tests_dir.rglob(pat))
-    
-    # Also look for tests in the main package
-    for pat in patterns:
-        files.extend(root.rglob(pat))
+    def analyze_file(self, file_path: str) -> AnalysisResult:
+        """Analyze a Python file and extract all testable functions
         
-    return files
-
-def _has_tests_for(module_rel: Path, func_name: str, test_files: List[Path]) -> bool:
-    """Check if tests exist for a specific function."""
-    mod_base = module_rel.stem
-    class_name = None
-    method_name = None
-    
-    # Handle class methods
-    if "." in func_name:
-        class_name, method_name = func_name.split(".", 1)
-    else:
-        method_name = func_name
-    
-    for tf in test_files:
-        # Check if the test file is named appropriately
-        if mod_base in tf.stem or (class_name and class_name.lower() in tf.stem.lower()):
-            content = read_text(tf)
-            # Check for test_function_name pattern
-            if f"test_{method_name}" in content or f"test_{func_name}" in content:
-                return True
-            # Check for TestClass pattern
-            if class_name and f"Test{class_name}" in content:
-                return True
-    
-    return False
-
-def analyze_project(root: str | Path) -> List[FunctionInfo]:
-    """Analyze a Python project to find functions and their test status."""
-    root = Path(root).resolve()
-    test_files = _likely_test_files(root)
-    results: List[FunctionInfo] = []
-
-    for file_path in iter_python_files(root):
-        rel = file_path.relative_to(root)
-        # Skip test files
-        if str(rel).startswith("tests/") or any(pattern in str(rel) for pattern in ["test_", "_test"]):
-            continue
+        Args:
+            file_path: Path to Python file
             
+        Returns:
+            AnalysisResult containing all extracted information
+        """
+        content = read_text(Path(file_path))
+        
         try:
-            src = read_text(file_path)
-            tree = ast.parse(src, filename=str(file_path))
-        except Exception as e:
-            print(f"Error parsing {file_path}: {e}")
-            continue
-
-        for qualname, lineno in _functions_in_ast(tree):
-            # Skip private methods, dunder methods
-            if qualname.startswith("_") and not qualname.startswith("__init__"):
-                continue
-                
-            has_tests = _has_tests_for(rel, qualname, test_files)
-            results.append(FunctionInfo(
-                file=file_path,
-                module_rel=rel,
-                qualname=qualname,
-                lineno=lineno,
-                has_tests=has_tests,
-            ))
-            
-    return results
-
-def parse_coverage_xml(xml_path: str) -> Dict[str, Set[int]]:
-    """Parse a coverage.py XML report to extract covered lines."""
-    tree = ET.parse(xml_path)
-    root = tree.getroot()
-    file_coverage = {}
-    
-    for class_node in root.findall(".//class"):
-        filename = class_node.attrib["filename"]
-        covered_lines = set(
-            int(line.attrib["number"])
-            for line in class_node.findall("lines/line")
-            if int(line.attrib["hits"]) > 0
+            tree = ast.parse(content)
+        except SyntaxError as e:
+            raise ValueError(f"Syntax error in {file_path}: {e}")
+        
+        # Extract components
+        self.imports = self._extract_imports(tree)
+        self.classes = self._extract_classes(tree)
+        self.functions = self._extract_functions(tree, content)
+        
+        # Calculate metrics
+        total_complexity = sum(f.complexity for f in self.functions)
+        avg_complexity = total_complexity / len(self.functions) if self.functions else 0
+        
+        return AnalysisResult(
+            file_path=file_path,
+            functions=self.functions,
+            imports=self.imports,
+            classes=self.classes,
+            total_functions=len(self.functions),
+            total_complexity=total_complexity,
+            average_complexity=round(avg_complexity, 2)
         )
-        file_coverage[filename] = covered_lines
-        
-    return file_coverage
-
-def map_coverage_to_functions(functions: List[FunctionInfo], 
-                             file_coverage: Dict[str, Set[int]]) -> List[FunctionInfo]:
-    """Map coverage information to function objects."""
-    for fi in functions:
-        rel_path = str(fi.module_rel)
-        covered_lines = file_coverage.get(rel_path, set())
-        if fi.lineno in covered_lines:
-            object.__setattr__(fi, "covered", True)
-            
-    return functions
-
-def summarize_coverage(functions: List[FunctionInfo]) -> Dict[str, any]:
-    """Summarize coverage information for reporting."""
-    need_tests = [fi for fi in functions if not fi.has_tests or not fi.covered]
-    priority_funcs = sorted([fi for fi in need_tests], 
-                           key=lambda x: not x.qualname.startswith("__init__"))[:5]
     
-    low_coverage_files = {fi.module_rel for fi in functions if not fi.covered}
+    def _extract_imports(self, tree: ast.AST) -> List[str]:
+        """Extract all import statements"""
+        imports = []
+        
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    imports.append(f"import {alias.name}")
+            elif isinstance(node, ast.ImportFrom):
+                module = node.module or ''
+                names = ', '.join([alias.name for alias in node.names])
+                imports.append(f"from {module} import {names}")
+        
+        return imports
     
-    return {
-        "need_tests_count": len(need_tests),
-        "low_coverage_count": len(low_coverage_files),
-        "priority_functions": [fi.qualname for fi in priority_funcs],
-        "untested_functions": need_tests,
-    }
-
-def generate_test_skeleton(function_info: FunctionInfo, root: Path) -> Optional[str]:
-    """Generate a test skeleton for a given function."""
-    import inspect
-    import importlib.util
+    def _extract_classes(self, tree: ast.AST) -> List[str]:
+        """Extract all class names"""
+        classes = []
+        
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ClassDef):
+                classes.append(node.name)
+        
+        return classes
     
-    # Try to import the module to get function signature
-    try:
-        module_path = function_info.file
-        module_name = function_info.module_rel.stem
+    def _extract_functions(self, tree: ast.AST, source: str) -> List[FunctionInfo]:
+        """Extract all function definitions"""
+        source_lines = source.split('\n')
         
-        # Create module spec and load module
-        spec = importlib.util.spec_from_file_location(module_name, module_path)
-        if not spec or not spec.loader:
-            return None
+        class FunctionVisitor(ast.NodeVisitor):
+            def __init__(self):
+                self.functions: List[FunctionInfo] = []
+                self.current_class: Optional[str] = None
             
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
+            def visit_ClassDef(self, node):
+                old_class = self.current_class
+                self.current_class = node.name
+                self.generic_visit(node)
+                self.current_class = old_class
+            
+            def visit_FunctionDef(self, node):
+                self._process_function(node, is_async=False)
+            
+            def visit_AsyncFunctionDef(self, node):
+                self._process_function(node, is_async=True)
+            
+            def _process_function(self, node: ast.FunctionDef, is_async: bool):
+                # Skip private test functions
+                if node.name.startswith('test_'):
+                    return
+                
+                # Get function source
+                start = node.lineno - 1
+                end = node.end_lineno if hasattr(node, 'end_lineno') else start + 10
+                func_source = '\n'.join(source_lines[start:end])
+                
+                # Get parameters (exclude self/cls)
+                params = [arg.arg for arg in node.args.args]
+                if params and params[0] in ('self', 'cls'):
+                    params = params[1:]
+                
+                # Get docstring
+                docstring = ast.get_docstring(node)
+                
+                # Get return type
+                return_type = None
+                if node.returns:
+                    try:
+                        return_type = ast.unparse(node.returns)
+                    except:
+                        return_type = str(node.returns)
+                
+                # Get decorators
+                decorators = []
+                for dec in node.decorator_list:
+                    try:
+                        decorators.append(ast.unparse(dec))
+                    except:
+                        decorators.append(str(dec))
+                
+                # Calculate complexity
+                complexity = self._calculate_complexity(node)
+                
+                func_info = FunctionInfo(
+                    name=node.name,
+                    params=params,
+                    docstring=docstring,
+                    source=func_source,
+                    return_type=return_type,
+                    line_number=node.lineno,
+                    complexity=complexity,
+                    is_async=is_async,
+                    decorators=decorators,
+                    class_name=self.current_class
+                )
+                
+                self.functions.append(func_info)
+            
+            def _calculate_complexity(self, node: ast.FunctionDef) -> int:
+                """Calculate cyclomatic complexity"""
+                complexity = 1
+                
+                for child in ast.walk(node):
+                    if isinstance(child, (ast.If, ast.While, ast.For, 
+                                        ast.Try, ast.With, ast.ExceptHandler)):
+                        complexity += 1
+                    elif isinstance(child, ast.BoolOp):
+                        complexity += len(child.values) - 1
+                
+                return complexity
         
-        # Find the function in the module
-        func_parts = function_info.qualname.split('.')
-        obj = module
-        
-        for part in func_parts:
-            obj = getattr(obj, part, None)
-            if obj is None:
-                break
-                
-        if obj and callable(obj):
-            # Get function signature
-            sig = inspect.signature(obj)
-            param_list = []
-            
-            for name, param in sig.parameters.items():
-                if name == 'self':
-                    continue
-                param_list.append(name)
-                
-            # Generate test skeleton
-            test_name = f"test_{function_info.qualname.replace('.', '_')}"
-            
-            if len(func_parts) > 1:  # It's a method
-                class_name = func_parts[0]
-                test_code = [
-                    f"def {test_name}():",
-                    f"    # Setup",
-                    f"    instance = {class_name}()",
-                    f"    # Exercise",
-                ]
-                
-                if param_list:
-                    params_str = ", ".join(f"{p}=None" for p in param_list)
-                    test_code.append(f"    result = instance.{func_parts[1]}({params_str})")
-                else:
-                    test_code.append(f"    result = instance.{func_parts[1]}()")
-            else:
-                # It's a regular function
-                test_code = [
-                    f"def {test_name}():",
-                    f"    # Setup",
-                ]
-                
-                if param_list:
-                    params_str = ", ".join(f"{p}=None" for p in param_list)
-                    test_code.append(f"    result = {function_info.qualname}({params_str})")
-                else:
-                    test_code.append(f"    result = {function_info.qualname}()")
-            
-            test_code.extend([
-                "    # Verify",
-                "    assert result is not None  # Replace with actual assertion",
-                "    # Cleanup - Add any necessary cleanup code here"
-            ])
-            
-            return "\n".join(test_code)
-            
-    except Exception as e:
-        print(f"Error generating test for {function_info.qualname}: {e}")
-        
-    # Fallback simple test skeleton
-    test_name = f"test_{function_info.qualname.replace('.', '_')}"
-    return "\n".join([
-        f"def {test_name}():",
-        f"    # TODO: Implement test for {function_info.qualname}",
-        f"    assert True  # Replace with actual test"
-    ])
+        visitor = FunctionVisitor()
+        visitor.visit(tree)
+        return visitor.functions

@@ -4,33 +4,46 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="smart-test",
-    version="0.1.0",
-    author="Prady",
-    author_email="pradyumnprasad.567@gmail.com",
-    description="A tool for analyzing and generating tests for Python projects",
+    name="smart-test-generator",
+    version="2.0.0",
+    author="Your Name",
+    author_email="your.email@example.com",
+    description="AI-Powered Python Test File Generator",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Pradyumn-cloud/VERITA",
-    packages=find_packages(exclude=["tests", "examples", "*.tests", "*.examples"]),
+    url="https://github.com/yourusername/smart-test-generator",
+    packages=find_packages(),
     classifiers=[
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "Topic :: Software Development :: Testing",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     install_requires=[
         "click>=8.0.0",
+        "rich>=10.0.0",
+        "google-generativeai>=0.3.0",
+        "python-dotenv>=0.19.0",
         "pytest>=6.0.0",
-        "pyyaml>=5.1",
-        "toml>=0.10.2",
     ],
-    entry_points={
-        "console_scripts": [
-            "smart-test=smart_test.main:main",
+    extras_require={
+        'dev': [
+            'pytest>=6.0.0',
+            'pytest-cov>=2.0.0',
+            'black>=21.0',
+            'flake8>=3.9.0',
         ],
     },
-    # Reduce test file discovery during installation
-    zip_safe=False,
-    include_package_data=False,
+    entry_points={
+        "console_scripts": [
+            "smart-test=smart_test.cli:cli",  # CHANGED from main:main to cli:cli
+        ],
+    },
 )
