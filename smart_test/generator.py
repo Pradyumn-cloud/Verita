@@ -1,4 +1,4 @@
-"""Test file generator"""
+#for test file generation
 from pathlib import Path
 from typing import Optional
 from .models import AnalysisResult, TestFramework, TestGenerationConfig
@@ -6,14 +6,8 @@ from .llm_client import LLMClient
 from .analyzer import CodeAnalyzer
 
 class TestGenerator:
-    """Generates test files for Python code"""
     
     def __init__(self, config: TestGenerationConfig):
-        """Initialize generator with configuration
-        
-        Args:
-            config: Test generation configuration
-        """
         self.config = config
         self.analyzer = CodeAnalyzer()
         self.llm_client = LLMClient() if config.use_ai else None
@@ -32,17 +26,13 @@ class TestGenerator:
         Returns:
             Path to generated test file
         """
-        # Analyze source file
         analysis = self.analyzer.analyze_file(source_file)
         
         if not analysis.functions:
             raise ValueError(f"No testable functions found in {source_file}")
-        
-        # Determine output path
         if not output_file:
             output_file = self._get_default_output_path(source_file)
-        
-        # Generate test content
+
         if self.config.use_ai and self.llm_client:
             test_content = self.llm_client.generate_test_file(
                 functions=analysis.functions,
@@ -52,8 +42,7 @@ class TestGenerator:
             )
         else:
             test_content = self._generate_basic_tests(analysis)
-        
-        # Write test file
+       
         output_path = Path(output_file)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(test_content, encoding='utf-8')
@@ -65,12 +54,11 @@ class TestGenerator:
         source_path = Path(source_file)
         test_filename = f"test_{source_path.name}"
         
-        # Check if source is in a subdirectory
         if source_path.parent.name and source_path.parent.name != '.':
-            # Create tests in parent directory
+
             test_dir = source_path.parent.parent / 'tests'
         else:
-            # Create tests directory next to file
+
             test_dir = source_path.parent / 'tests'
         
         return str(test_dir / test_filename)

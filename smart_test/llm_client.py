@@ -1,4 +1,3 @@
-"""LLM Client for test generation using Google Gemini"""
 import os
 from typing import Optional, List
 from .models import FunctionInfo, TestFramework
@@ -8,26 +7,23 @@ try:
     import google.generativeai as genai
 except ImportError:
     raise ImportError(
-        "Google Generative AI not installed. Install with: pip install google-generativeai"
+        "pls install google gen ai package by - pip install google-generativeai"
     )
 
 class LLMClient:
-    """Client for generating tests using Google Gemini API"""
     
     def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
         """Initialize LLM client
         
         Args:
-            api_key: Gemini API key (uses config if not provided)
-            model: Model name (uses config if not provided)
+            api_key
+            model name
         """
         self.api_key = api_key or Config.get_api_key()
         self.model_name = model or Config.GEMINI_MODEL
         
-        # Configure Gemini
         genai.configure(api_key=self.api_key)
         
-        # Initialize model
         self.generation_config = {
             'temperature': 0.7,
             'top_p': 0.95,
@@ -39,8 +35,7 @@ class LLMClient:
             model_name=self.model_name,
             generation_config=self.generation_config
         )
-        
-        # Safety settings
+
         self.safety_settings = [
             {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
             {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
@@ -55,10 +50,9 @@ class LLMClient:
         imports: List[str],
         framework: TestFramework = TestFramework.PYTEST
     ) -> str:
-        """Generate complete test file for Python functions
-        
+        """
         Args:
-            functions: List of functions to generate tests for
+            functions: List of functions
             source_file: Path to source file being tested
             imports: List of import statements from source
             framework: Test framework to use
@@ -80,7 +74,7 @@ class LLMClient:
             return self._generate_fallback_tests(functions, source_file, framework)
             
         except Exception as e:
-            print(f"⚠️  Error generating tests with AI: {e}")
+            print(f"Error generating tests with AI: {e}")
             return self._generate_fallback_tests(functions, source_file, framework)
     
     def _build_test_file_prompt(
@@ -90,7 +84,6 @@ class LLMClient:
         imports: List[str],
         framework: TestFramework
     ) -> str:
-        """Build comprehensive prompt for test generation"""
         
         functions_summary = "\n\n".join([
             f"### Function: {func.name}\n"

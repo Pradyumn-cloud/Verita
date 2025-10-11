@@ -1,5 +1,3 @@
-"""Smart Test Generator - AI-Powered Python Test File Generator"""
-
 from .models import FunctionInfo, TestFramework, TestGenerationConfig
 from .analyzer import CodeAnalyzer
 from .generator import TestGenerator
