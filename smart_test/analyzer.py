@@ -5,6 +5,7 @@ from typing import List
 from pathlib import Path
 from .models import FunctionInfo, AnalysisResult
 from .utils import read_text
+from typing import Optional
 
 
 class CodeAnalyzer:
