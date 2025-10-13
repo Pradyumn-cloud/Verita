@@ -1,35 +1,55 @@
 from pathlib import Path
-from typing import Iterable, List, Dict, Any, Optional
+from typing import Iterable, Dict, Any, Optional
 import json
 import yaml
 import toml
 from contextlib import contextmanager
 
 PYTHON_GLOB = "*.py"
-CONFIG_FILENAMES = ["smart_test.json", "smart_test.yaml", "smart_test.toml", "pyproject.toml"]
+CONFIG_FILENAMES = [
+    "smart_test.json",
+    "smart_test.yaml",
+    "smart_test.toml",
+    "pyproject.toml",
+]
+
 
 def iter_python_files(root: str | Path) -> Iterable[Path]:
     """Iterate through Python files in a project, skipping typical venv directories."""
     base = Path(root)
 
     skip_dirs = {
-        "venv", "env", ".venv", ".env", ".git", 
-        "__pycache__", "build", "dist", ".pytest_cache", 
-        ".mypy_cache", ".tox", ".eggs", "*.egg-info"
+        "venv",
+        "env",
+        ".venv",
+        ".env",
+        ".git",
+        "__pycache__",
+        "build",
+        "dist",
+        ".pytest_cache",
+        ".mypy_cache",
+        ".tox",
+        ".eggs",
+        "*.egg-info",
     }
-    
+
     for path in base.rglob(PYTHON_GLOB):
 
         parts = path.parts
         skip = False
         for part in parts:
-            if any(part == skip_dir or (skip_dir.startswith("*.") and part.endswith(skip_dir[1:])) 
-                   for skip_dir in skip_dirs):
+            if any(
+                part == skip_dir
+                or (skip_dir.startswith("*.") and part.endswith(skip_dir[1:]))
+                for skip_dir in skip_dirs
+            ):
                 skip = True
                 break
-        
+
         if not skip:
             yield path
+
 
 def read_text(path: Path) -> str:
     """Read text from a file with robust encoding handling."""
@@ -42,6 +62,7 @@ def read_text(path: Path) -> str:
         print(f"Error reading {path}: {e}")
         return ""
 
+
 def find_config_file(root: Path) -> Optional[Path]:
     """Find a configuration file in the project root."""
     for filename in CONFIG_FILENAMES:
@@ -50,12 +71,13 @@ def find_config_file(root: Path) -> Optional[Path]:
             return config_path
     return None
 
+
 def load_config(root: Path) -> Dict[str, Any]:
     """Load configuration from a config file."""
     config_path = find_config_file(root)
     if not config_path:
         return {}
-        
+
     try:
         content = read_text(config_path)
         if str(config_path).endswith(".json"):
@@ -70,13 +92,15 @@ def load_config(root: Path) -> Dict[str, Any]:
             return config
     except Exception as e:
         print(f"Error loading config from {config_path}: {e}")
-        
+
     return {}
+
 
 def create_directory_if_not_exists(path: Path) -> None:
     """Create a directory if it doesn't exist."""
     if not path.exists():
         path.mkdir(parents=True)
+
 
 @contextmanager
 def safe_write_file(path: Path):
@@ -88,7 +112,7 @@ def safe_write_file(path: Path):
     if not path.parent.exists():
         path.parent.mkdir(parents=True)
 
-    with NamedTemporaryFile(mode='w', delete=False, dir=path.parent) as temp:
+    with NamedTemporaryFile(mode="w", delete=False, dir=path.parent) as temp:
         try:
             yield temp
             temp.flush()

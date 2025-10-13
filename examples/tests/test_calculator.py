@@ -1,6 +1,5 @@
 """Tests for examples\calculator.py"""
 
-import pytest
 from calculator import *
 
 
@@ -74,4 +73,3 @@ def test_calculate_basic():
     """Test calculate with basic inputs"""
     # TODO: Add test implementation
     pass
-

@@ -35,11 +35,11 @@ setup(
         "PyYAML>=6.0",
     ],
     extras_require={
-        'dev': [
-            'pytest>=6.0.0',
-            'pytest-cov>=2.0.0',
-            'black>=21.0',
-            'flake8>=3.9.0',
+        "dev": [
+            "pytest>=6.0.0",
+            "pytest-cov>=2.0.0",
+            "black>=21.0",
+            "flake8>=3.9.0",
         ],
     },
     entry_points={

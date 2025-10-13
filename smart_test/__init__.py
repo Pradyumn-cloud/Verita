@@ -4,13 +4,13 @@ from .generator import TestGenerator
 from .llm_client import LLMClient
 from .config import Config
 
-__version__ = '2.0.0'
+__version__ = "2.0.0"
 __all__ = [
-    'FunctionInfo',
-    'TestFramework',
-    'TestGenerationConfig',
-    'CodeAnalyzer',
-    'TestGenerator',
-    'LLMClient',
-    'Config'
+    "FunctionInfo",
+    "TestFramework",
+    "TestGenerationConfig",
+    "CodeAnalyzer",
+    "TestGenerator",
+    "LLMClient",
+    "Config",
 ]
