@@ -6,8 +6,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="smart-test-generator",
     version="2.0.0",
-    author="Your Name",
-    author_email="your.email@example.com",
+    author="Pradyumn-cloud",
+    author_email="pradyumnprasad.567@gmail.com",
     description="AI-Powered Python Test File Generator",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -43,7 +43,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "smart-test=smart_test.cli:cli",  # CHANGED from main:main to cli:cli
+            "smart-test=smart_test.cli:cli",
         ],
     },
 )

@@ -1,0 +1,32 @@
+name: "Run Smart Test (manual)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      paths:
+        description: "Glob/path"
+        required: true
+        default: "src/**/*.py"
+      model:
+        description: "Model id"
+        required: false
+        default: ""
+      out-dir:
+        description: "Output dir"
+        required: false
+        default: "generated-tests"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  run:
+    uses: ./.github/workflows/smart-test.yml
+    secrets: inherit
+    with:
+      paths: ${{ inputs.paths }}
+      model: ${{ inputs.model }}
+      out-dir: ${{ inputs['out-dir'] }}
+      comment-results: false
+      open-pr: false

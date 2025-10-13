@@ -1,39 +1,21 @@
-Verita Personal and Educational License v1.0
-LicenseRef-Verita-PEL-1.0
+MIT License
 
-Copyright (c) 2025 Pradyumn-cloud. All rights reserved.
+Copyright (c) 2025 Pradyumn
 
-Grant
-Subject to this License, you are granted a limited, non-exclusive, non-transferable, revocable license to:
-1) View and read the source code.
-2) Run the Software and make local modifications solely for:
-   a) Personal, non-commercial use by you, and/or
-   b) Educational use (learning, teaching, or academic research) where no commercial advantage is intended or received.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-Restrictions
-You may NOT:
-- Use the Software for any commercial, professional, production, internal business, or client work.
-- Host, provide, or offer the Software as a service (SaaS) or include it in any product.
-- Distribute, publish, sublicense, sell, rent, or lease the Software or any derivative works.
-- Share the Software or derivatives with others, including by posting to public repositories, package indexes, or forums.
-- Incorporate code, algorithms, or data from the Software into other projects beyond your personal or educational use.
-- Use the Software or its outputs to train, fine-tune, or evaluate AI/ML models.
-- Remove or alter copyright, license notices, or attribution.
-- Circumvent technical restrictions or security measures.
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-Conditions
-- You must retain this License in all permitted copies.
-- Any permitted academic use must include proper attribution to “Verita” and the copyright holder.
-- This License does not grant trademark rights.
-
-Termination
-This License terminates automatically if you breach any term. Upon termination, you must cease use and delete all copies. The Licensor may grant written exceptions.
-
-No Warranty
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. USE AT YOUR OWN RISK.
-
-Limitation of Liability
-IN NO EVENT WILL THE COPYRIGHT HOLDER BE LIABLE FOR ANY DAMAGES ARISING OUT OF USE, EVEN IF ADVISED OF THE POSSIBILITY.
-
-Contact
-For commercial or other licensing, contact: pradyumnprasad.567@gmail.com
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.

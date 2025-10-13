@@ -5,7 +5,7 @@
 ### AI-Powered Python Test Suite Generator
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Powered by Google Gemini](https://img.shields.io/badge/Powered%20by-Google%20Gemini-4285F4.svg)](https://ai.google.dev/)
 
 **Automatically generate comprehensive, intelligent test files for your Python projects using AI.**
@@ -147,6 +147,52 @@ smart-test [COMMAND] [OPTIONS]
 | `generate` | Generate test file for a Python source file | `smart-test generate app.py` |
 | `analyze` | Analyze code without generating tests | `smart-test analyze app.py` |
 | `batch` | Generate tests for all files in a directory | `smart-test batch src/` |
+
+---
+
+## 🚀 Use as a GitHub Action
+
+Run Smart Test on GitHub’s runners with zero install. Results are uploaded as artifacts and can optionally be pushed as a PR.
+
+1) Add a secret GEMINI_API_KEY in your repo:
+- Settings → Secrets and variables → Actions → New repository secret → Name: `GEMINI_API_KEY`
+
+2) Create a workflow in your repo:
+
+```yaml
+name: Smart Test
+on:
+    workflow_dispatch:
+        inputs:
+            paths:
+                description: "Glob or path to scan"
+                required: true
+                default: "src/**/*.py"
+
+jobs:
+    run:
+        uses: Pradyumn-cloud/Verita/.github/workflows/smart-test.yml@v1
+        secrets:
+            GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        with:
+            paths: ${{ inputs.paths }}
+            # model: "gemini-1.5-pro"      # optional
+            # out-dir: "generated-tests"   # optional
+            # comment-results: false       # optional
+            # open-pr: true                # optional
+```
+
+### 🔐 Secrets & Permissions
+
+- Secrets:
+    - `GEMINI_API_KEY` is required to generate tests with AI.
+- Permissions:
+    - The reusable workflow requests `contents: write` and `pull-requests: write` only if you enable PR updates (comment or open-pr).
+    - Manual runs use minimal permissions by default.
+
+### ▶️ Run in this repository
+
+This repo includes a “Run Smart Test (manual)” workflow. Go to Actions → “Run workflow”, set a `paths` glob (e.g., `examples/**/*.py`), run it, then download the `smart-test-results` artifact.
 
 ---
 
@@ -348,11 +394,7 @@ smart-test generate examples/calculator.py
 
 ## 📝 License
 
-This project is licensed under a **Proprietary License**.
-
-**Copyright © 2025 Pradyumn-cloud. All Rights Reserved.**
-
-See the [LICENSE](LICENSE) file for details.
+MIT © 2025 Pradyumn. See the [LICENSE](LICENSE) file for details.
 
 ---
 

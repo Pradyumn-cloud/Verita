@@ -1,0 +1,47 @@
+name: "Smart Test Generator"
+description: "Generate Python tests with AI on GitHub runners"
+author: "Pradyumn"
+branding:
+  icon: "zap"
+  color: "blue"
+
+inputs:
+  paths:
+    description: "Glob/path to scan (e.g., src/**/*.py or a file)"
+    required: true
+  model:
+    description: "Optional model id"
+    required: false
+    default: ""
+  out-dir:
+    description: "Directory to write generated tests"
+    required: false
+    default: "generated-tests"
+  gemini-api-key:
+    description: "Gemini API key (pass from secrets)"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install package
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        pip install .
+
+    - name: Run smart-test
+      shell: bash
+      env:
+        GEMINI_API_KEY: ${{ inputs.gemini-api-key }}
+      run: |
+        set -euo pipefail
+        extra=()
+        if [ -n "${{ inputs.model }}" ]; then
+          extra+=(--model "${{ inputs.model }}")
+        fi
+        smart-test generate "${{ inputs.paths }}" "${extra[@]}" --out-dir "${{ inputs.out-dir }}"
