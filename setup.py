@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="smart-test-generator",
-    version="2.0.0",
+    version="2.0.1",
     author="Pradyumn-cloud",
     author_email="pradyumnprasad.567@gmail.com",
     description="AI-Powered Python Test File Generator",
@@ -32,6 +32,7 @@ setup(
         "google-generativeai>=0.3.0",
         "python-dotenv>=0.19.0",
         "pytest>=6.0.0",
+        "PyYAML>=6.0",
     ],
     extras_require={
         'dev': [
