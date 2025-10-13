@@ -1,11 +1,11 @@
-from setuptools import setup, find_packages
+﻿from setuptools import setup, find_packages
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
     name="smart-test-generator",
-    version="2.0.1",
+    version="2.0.2",
     author="Pradyumn-cloud",
     author_email="pradyumnprasad.567@gmail.com",
     description="AI-Powered Python Test File Generator",
