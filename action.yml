@@ -38,6 +38,10 @@ runs:
         python -m pip install --upgrade pip
         pip install ${{ github.action_path }}
 
+    - name: Create output directory
+      shell: bash
+      run: mkdir -p "${{ inputs.output-dir }}"
+
     - name: Run smart-test batch command
       shell: bash
       env:
