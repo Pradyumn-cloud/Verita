@@ -12,7 +12,7 @@ on:
         required: false
         type: string
         default: ""
-      out-dir:
+      output-dir:
         description: "Output dir"
         required: false
         type: string
@@ -46,14 +46,14 @@ jobs:
         with:
           paths: ${{ inputs.paths }}
           model: ${{ inputs.model }}
-          out-dir: ${{ inputs['out-dir'] }}
+          output-dir: ${{ inputs['output-dir'] }}
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
 
       - name: Upload generated tests
         uses: actions/upload-artifact@v4
         with:
           name: smart-test-results
-          path: ${{ inputs['out-dir'] }}
+          path: ${{ inputs['output-dir'] }}
           if-no-files-found: warn
 
       - name: Comment summary on PR
@@ -79,9 +79,9 @@ jobs:
           git checkout -b "$BR"
           mkdir -p tests/generated
           # Copy generated tests into a committed location
-          if [ -d "${{ inputs['out-dir'] }}" ]; then
+          if [ -d "${{ inputs['output-dir'] }}" ]; then
             rm -rf tests/generated/*
-            cp -R "${{ inputs['out-dir'] }}/." "tests/generated/"
+            cp -R "${{ inputs['output-dir'] }}/" "tests/generated/"
           fi
           if git diff --quiet; then
             echo "No changes to commit."

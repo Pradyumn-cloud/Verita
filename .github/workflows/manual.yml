@@ -11,7 +11,7 @@ on:
         description: "Model id"
         required: false
         default: ""
-      out-dir:
+      output-dir:
         description: "Output dir"
         required: false
         default: "generated-tests"
@@ -27,6 +27,6 @@ jobs:
     with:
       paths: ${{ inputs.paths }}
       model: ${{ inputs.model }}
-      out-dir: ${{ inputs['out-dir'] }}
+      output-dir: ${{ inputs['output-dir'] }}
       comment-results: false
       open-pr: false
