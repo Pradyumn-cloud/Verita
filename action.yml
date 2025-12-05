@@ -42,6 +42,13 @@ runs:
       shell: bash
       run: mkdir -p "${{ inputs.output-dir }}"
 
+    - name: Debug - List files to be scanned
+      shell: bash
+      run: |
+        echo "Scanning path: ${{ inputs.paths }}"
+        echo "Files found:"
+        find "${{ inputs.paths }}" -name "*.py" -type f 2>/dev/null || echo "Path not found or no Python files"
+
     - name: Run smart-test batch command
       shell: bash
       env:
@@ -51,3 +58,9 @@ runs:
         smart-test batch "${{ inputs.paths }}" \
           --output-dir "${{ inputs.output-dir }}" \
           --framework "${{ inputs.framework }}"
+    
+    - name: Debug - List generated files
+      shell: bash
+      run: |
+        echo "Generated files in ${{ inputs.output-dir }}:"
+        ls -la "${{ inputs.output-dir }}" || echo "Output directory is empty or doesn't exist"
