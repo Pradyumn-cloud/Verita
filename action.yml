@@ -7,7 +7,7 @@ branding:
 
 inputs:
   paths:
-    description: "Directory to scan (e.g., src/ or .  for current directory)"
+    description: "Paths to scan - can be a single file, directory, or comma-separated list (e.g., 'src/', 'file.py', 'src/,lib/file.py')"
     required: true
   model:
     description: "Optional model id (not currently supported by CLI)"
@@ -45,20 +45,122 @@ runs:
     - name: Debug - List files to be scanned
       shell: bash
       run: |
-        echo "Scanning path: ${{ inputs.paths }}"
-        echo "Files found:"
-        find "${{ inputs.paths }}" -name "*.py" -type f 2>/dev/null || echo "Path not found or no Python files"
+        echo "Scanning paths: ${{ inputs.paths }}"
+        IFS=',' read -ra PATHS <<< "${{ inputs.paths }}"
+        for path in "${PATHS[@]}"; do
+          path=$(echo "$path" | xargs)  # Trim whitespace
+          if [ -f "$path" ]; then
+            if [[ "$path" == *.py ]]; then
+              echo "  ✓ Python file: $path"
+            else
+              echo "  ⚠ Not a Python file: $path"
+            fi
+          elif [ -d "$path" ]; then
+            echo "  ✓ Directory: $path"
+            file_count=$(find "$path" -name "*.py" -type f 2>/dev/null | wc -l)
+            echo "    Found $file_count Python files"
+          else
+            echo "  ✗ Not found: $path"
+          fi
+        done
 
-    - name: Run smart-test batch command
+    - name: Run smart-test command
       shell: bash
       env:
         GEMINI_API_KEY: ${{ inputs.gemini-api-key }}
       run: |
-        set -euo pipefail
-        smart-test batch "${{ inputs.paths }}" \
-          --output-dir "${{ inputs.output-dir }}" \
-          --framework "${{ inputs.framework }}"
-    
+        # Count existing test files before generation
+        BEFORE_COUNT=$(find "${{ inputs.output-dir }}" -name "test_*.py" -type f 2>/dev/null | wc -l)
+        
+        # Split comma-separated paths
+        IFS=',' read -ra PATHS <<< "${{ inputs.paths }}"
+        
+        SUCCESS_PATHS=0
+        FAIL_PATHS=0
+        
+        for path in "${PATHS[@]}"; do
+          # Trim whitespace
+          path=$(echo "$path" | xargs)
+          
+          # Skip empty paths
+          if [ -z "$path" ]; then
+            continue
+          fi
+          
+          if [ -f "$path" ]; then
+            # Validate it's a Python file
+            if [[ "$path" != *.py ]]; then
+              echo "  ⚠ Skipping non-Python file: $path"
+              FAIL_PATHS=$((FAIL_PATHS + 1))
+              continue
+            fi
+            
+            # Single file: use generate command
+            echo "Generating test for file: $path"
+            
+            # Preserve directory structure to avoid overwrites
+            # Convert absolute/relative path to safe filename
+            SAFE_PATH=$(echo "$path" | sed 's/[^a-zA-Z0-9._-]/_/g')
+            FILE_NAME=$(basename "$path")
+            OUTPUT_FILE="${{ inputs.output-dir }}/test_${FILE_NAME}"
+            
+            # Check if output file already exists from this run
+            if [ -f "$OUTPUT_FILE" ]; then
+              echo "  ⚠ Warning: $OUTPUT_FILE already exists, using unique name"
+              OUTPUT_FILE="${{ inputs.output-dir }}/test_${SAFE_PATH}"
+            fi
+            
+            if smart-test generate "$path" \
+              --output "$OUTPUT_FILE" \
+              --framework "${{ inputs.framework }}"; then
+              SUCCESS_PATHS=$((SUCCESS_PATHS + 1))
+              echo "  ✓ Success: $OUTPUT_FILE"
+            else
+              FAIL_PATHS=$((FAIL_PATHS + 1))
+              echo "  ✗ Failed: $path"
+            fi
+            
+          elif [ -d "$path" ]; then
+            # Directory: use batch command
+            echo "Generating tests for directory: $path"
+            FILE_COUNT=$(find "$path" -name "*.py" -type f 2>/dev/null | wc -l)
+            echo "  Found $FILE_COUNT Python files to process"
+            
+            if smart-test batch "$path" \
+              --output-dir "${{ inputs.output-dir }}" \
+              --framework "${{ inputs.framework }}"; then
+              SUCCESS_PATHS=$((SUCCESS_PATHS + 1))
+              echo "  ✓ Success: $path"
+            else
+              FAIL_PATHS=$((FAIL_PATHS + 1))
+              echo "  ✗ Failed: $path"
+            fi
+          else
+            echo "  ⚠ Warning: Path not found or invalid: $path"
+            FAIL_PATHS=$((FAIL_PATHS + 1))
+          fi
+        done
+        
+        # Count only newly generated test files
+        AFTER_COUNT=$(find "${{ inputs.output-dir }}" -name "test_*.py" -type f 2>/dev/null | wc -l)
+        NEW_FILES=$((AFTER_COUNT - BEFORE_COUNT))
+        
+        echo ""
+        echo "========================================="
+        echo "Summary:"
+        echo "  Paths processed: $((SUCCESS_PATHS + FAIL_PATHS))"
+        echo "  ✓ Successful paths: $SUCCESS_PATHS"
+        echo "  ✗ Failed paths: $FAIL_PATHS"
+        echo "  📄 New test files generated: $NEW_FILES"
+        echo "  📁 Total test files in output: $AFTER_COUNT"
+        echo "========================================="
+        
+        # Exit with error if all paths failed
+        if [ $SUCCESS_PATHS -eq 0 ] && [ $FAIL_PATHS -gt 0 ]; then
+          echo "Error: All paths failed to generate tests"
+          exit 1
+        fi
+
     - name: Debug - List generated files
       shell: bash
       run: |
