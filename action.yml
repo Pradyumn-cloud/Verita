@@ -7,19 +7,23 @@ branding:
 
 inputs:
   paths:
-    description: "Glob/path to scan (e.g., src/**/*.py or a file)"
+    description: "Directory to scan (e.g., src/ or .  for current directory)"
     required: true
   model:
-    description: "Optional model id"
+    description: "Optional model id (not currently supported by CLI)"
     required: false
     default: ""
-  out-dir:
+  output-dir:
     description: "Directory to write generated tests"
     required: false
     default: "generated-tests"
   gemini-api-key:
     description: "Gemini API key (pass from secrets)"
     required: true
+  framework:
+    description: "Test framework (pytest or unittest)"
+    required: false
+    default: "pytest"
 
 runs:
   using: "composite"
@@ -34,14 +38,12 @@ runs:
         python -m pip install --upgrade pip
         pip install ${{ github.action_path }}
 
-    - name: Run smart-test
+    - name: Run smart-test batch command
       shell: bash
       env:
         GEMINI_API_KEY: ${{ inputs.gemini-api-key }}
       run: |
         set -euo pipefail
-        extra=()
-        if [ -n "${{ inputs.model }}" ]; then
-          extra+=(--model "${{ inputs.model }}")
-        fi
-        smart-test generate "${{ inputs.paths }}" "${extra[@]}" --out-dir "${{ inputs.out-dir }}"
+        smart-test batch "${{ inputs.paths }}" \
+          --output-dir "${{ inputs.output-dir }}" \
+          --framework "${{ inputs.framework }}"
