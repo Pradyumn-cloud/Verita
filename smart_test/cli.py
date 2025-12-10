@@ -32,8 +32,9 @@ def cli():
 )
 @click.option("--no-ai", is_flag=True, help="Generate tests without AI")
 @click.option("--api-key", "-k", envvar="GEMINI_API_KEY", help="Gemini API key")
+@click.option("--model", "-m", envvar="GEMINI_MODEL", help="Gemini model name (gemini-1.5-flash, gemini-1.5-pro, gemini-pro)")
 @click.option("--verbose", "-v", is_flag=True, help="Verbose output")
-def generate(file, output, framework, no_ai, api_key, verbose):
+def generate(file, output, framework, no_ai, api_key, model, verbose):
 
     # Validate API key if using AI
     if not no_ai and not api_key:
@@ -54,9 +55,11 @@ def generate(file, output, framework, no_ai, api_key, verbose):
         verbose=verbose,
     )
 
-    # Set API key if provided
+    # Set API key and model if provided
     if api_key:
         Config.GEMINI_API_KEY = api_key
+    if model:
+        Config.GEMINI_MODEL = model
 
     with Progress(
         SpinnerColumn(),
@@ -120,16 +123,19 @@ def analyze(file, json_output):
 )
 @click.option("--no-ai", is_flag=True, help="Generate without AI")
 @click.option("--api-key", "-k", envvar="GEMINI_API_KEY", help="Gemini API key")
+@click.option("--model", "-m", envvar="GEMINI_MODEL", help="Gemini model name (gemini-1.5-flash, gemini-1.5-pro, gemini-pro)")
 @click.option("--exclude", "-e", multiple=True, help="Patterns to exclude")
-def batch(directory, output_dir, framework, no_ai, api_key, exclude):
+def batch(directory, output_dir, framework, no_ai, api_key, model, exclude):
 
     if not no_ai and not api_key:
         console.print("[red] API key required for AI generation[/red]")
         sys.exit(1)
 
-    # Set API key
+    # Set API key and model
     if api_key:
         Config.GEMINI_API_KEY = api_key
+    if model:
+        Config.GEMINI_MODEL = model
 
     # Find Python files
     dir_path = Path(directory)

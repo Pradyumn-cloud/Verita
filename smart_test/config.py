@@ -8,7 +8,7 @@ load_dotenv()
 class Config:
 
     GEMINI_API_KEY: Optional[str] = os.getenv("GEMINI_API_KEY")
-    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-1.5-pro")
+    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "models/gemini-2.0-flash")
 
     DEFAULT_FRAMEWORK: str = "pytest"
     DEFAULT_OUTPUT_DIR: str = "tests"

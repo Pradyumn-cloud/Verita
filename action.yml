@@ -1,5 +1,5 @@
 name: "Smart Test Generator"
-description: "Generate Python tests with AI on GitHub runners"
+description: "AI-powered Python test generation using LLM. Generate comprehensive pytest/unittest tests automatically for your Python code."
 author: "Pradyumn"
 branding:
   icon: "zap"
@@ -7,23 +7,38 @@ branding:
 
 inputs:
   paths:
-    description: "Paths to scan - can be a single file, directory, or comma-separated list (e.g., 'src/', 'file.py', 'src/,lib/file.py')"
+    description: |
+      Path(s) to Python files or directories to scan.
+      Examples: 'src/' (directory), 'app.py' (single file), 'src/,lib/utils.py' (multiple paths - comma-separated)
     required: true
-  model:
-    description: "Optional model id (not currently supported by CLI)"
-    required: false
-    default: ""
-  output-dir:
-    description: "Directory to write generated tests"
-    required: false
-    default: "generated-tests"
+  
   gemini-api-key:
-    description: "Gemini API key (pass from secrets)"
+    description: |
+      Your Gemini API Key - Get FREE key at: https://aistudio.google.com/app/apikey
+      ⚠️ Store as repository secret: Settings → Secrets → Actions → New secret
+      Use: ${{ secrets.GEMINI_API_KEY }}
     required: true
+  
+  model:
+    description: |
+      Gemini AI model to use.
+      Options: models/gemini-2.0-flash (Fast, recommended), models/gemini-2.5-flash (Latest), models/gemini-pro-latest (🎯 Most capable)
+    required: false
+    default: "models/gemini-2.0-flash"
+  
   framework:
-    description: "Test framework (pytest or unittest)"
+    description: |
+      Python testing framework.
+      Options: 'pytest' (recommended) or 'unittest'
     required: false
     default: "pytest"
+  
+  output-dir:
+    description: |
+      Directory where generated test files will be saved.
+      Example: 'tests/generated' or 'generated-tests'
+    required: false
+    default: "generated-tests"
 
 runs:
   using: "composite"
@@ -112,7 +127,8 @@ runs:
             
             if smart-test generate "$path" \
               --output "$OUTPUT_FILE" \
-              --framework "${{ inputs.framework }}"; then
+              --framework "${{ inputs.framework }}" \
+              --model "${{ inputs.model }}"; then
               SUCCESS_PATHS=$((SUCCESS_PATHS + 1))
               echo "  ✓ Success: $OUTPUT_FILE"
             else
@@ -128,7 +144,8 @@ runs:
             
             if smart-test batch "$path" \
               --output-dir "${{ inputs.output-dir }}" \
-              --framework "${{ inputs.framework }}"; then
+              --framework "${{ inputs.framework }}" \
+              --model "${{ inputs.model }}"; then
               SUCCESS_PATHS=$((SUCCESS_PATHS + 1))
               echo "  ✓ Success: $path"
             else

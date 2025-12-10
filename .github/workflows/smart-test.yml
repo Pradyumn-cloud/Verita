@@ -8,10 +8,10 @@ on:
         required: true
         type: string
       model:
-        description: "Model id"
+        description: "Gemini model to use"
         required: false
         type: string
-        default: ""
+        default: "models/gemini-2.0-flash"
       output-dir:
         description: "Output dir"
         required: false

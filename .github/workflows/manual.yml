@@ -8,9 +8,9 @@ on:
         required: true
         default: "src/**/*.py"
       model:
-        description: "Model id"
+        description: "Gemini model (e.g., models/gemini-2.0-flash, models/gemini-pro-latest)"
         required: false
-        default: ""
+        default: "models/gemini-2.0-flash"
       output-dir:
         description: "Output dir"
         required: false
