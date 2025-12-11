@@ -308,7 +308,7 @@ smart-test generate examples/mypackage/string_utils.py -o tests/test_string_util
 
 ---
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 Verita/
@@ -343,7 +343,7 @@ Create a `.env` file in the project root:
 GEMINI_API_KEY=your_actual_api_key_here
 
 # Optional (with defaults)
-GEMINI_MODEL=gemini-1.5-flash
+GEMINI_MODEL=models/gemini-2.0-flash
 MAX_RETRIES=3
 TIMEOUT=30
 ```
@@ -418,6 +418,6 @@ MIT © 2025 Pradyumn. See the [LICENSE](LICENSE) file for details.
 
 **⭐ Star this repo if you find it helpful! ⭐**
 
-Made with ❤️ by Pradyumn
+Made by Pradyumn
 
 </div>
