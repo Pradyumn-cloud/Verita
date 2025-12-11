@@ -160,39 +160,119 @@ Run Smart Test on GitHub’s runners with zero install. Results are uploaded as 
 2) Create a workflow in your repo:
 
 ```yaml
-name: Smart Test
+name: Smart Test Generator
 on:
-    workflow_dispatch:
-        inputs:
-            paths:
-                description: "Glob or path to scan"
-                required: true
-                default: "src/**/*.py"
+  workflow_dispatch:
+    inputs:
+      paths:
+        description: "Path(s) to scan (e.g., src/ or app.py)"
+        required: true
+        default: "src/**/*.py"
 
 jobs:
-    run:
-        uses: Pradyumn-cloud/Verita/.github/workflows/smart-test.yml@v1
-        secrets:
-            GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  generate-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Generate AI Tests
+        uses: Pradyumn-cloud/Verita@v4.0.3
         with:
-            paths: ${{ inputs.paths }}
-            # model: "gemini-1.5-pro"      # optional
-            # out-dir: "generated-tests"   # optional
-            # comment-results: false       # optional
-            # open-pr: true                # optional
+          paths: ${{ inputs.paths }}
+          gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
+          # model: "models/gemini-2.0-flash"  # optional (default)
+          # framework: "pytest"                 # optional (default)
+          # output-dir: "generated-tests"       # optional (default)
+      
+      - name: Upload Generated Tests
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-generated-tests
+          path: generated-tests/
 ```
 
-### 🔐 Secrets & Permissions
+### 🎯 Supported Scenarios
 
-- Secrets:
-    - `GEMINI_API_KEY` is required to generate tests with AI.
-- Permissions:
-    - The reusable workflow requests `contents: write` and `pull-requests: write` only if you enable PR updates (comment or open-pr).
-    - Manual runs use minimal permissions by default.
+The action intelligently handles all these input patterns:
 
-### ▶️ Run in this repository
+| Scenario | Example Input | Result |
+|----------|---------------|--------|
+| **Single File** | `app.py` | Generates `test_app.py` |
+| **Single Directory** | `src/` | Generates tests for all `.py` files in `src/` (recursive) |
+| **Multiple Files** | `app.py,utils.py,config.py` | Generates 3 separate test files |
+| **Multiple Directories** | `src/,lib/,tests/helpers/` | Processes all Python files in each directory |
+| **Mixed Paths** | `app.py,src/models/,lib/utils.py` | Handles both files and directories together |
+| **Nested Directories** | `src/models/user/` | Recursively finds all Python files in subdirectories |
 
-This repo includes a “Run Smart Test (manual)” workflow. Go to Actions → “Run workflow”, set a `paths` glob (e.g., `examples/**/*.py`), run it, then download the `smart-test-results` artifact.
+**Workflow Examples:**
+
+```yaml
+# Example 1: Single Python file
+- uses: Pradyumn-cloud/Verita@v4.0.3
+  with:
+    paths: 'calculator.py'
+    gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
+
+# Example 2: Entire directory (recursive)
+- uses: Pradyumn-cloud/Verita@v4.0.3
+  with:
+    paths: 'src/'
+    gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
+
+# Example 3: Multiple specific files (comma-separated, NO SPACES)
+- uses: Pradyumn-cloud/Verita@v4.0.3
+  with:
+    paths: 'app.py,utils.py,config.py'
+    gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
+
+# Example 4: Multiple directories
+- uses: Pradyumn-cloud/Verita@v4.0.3
+  with:
+    paths: 'src/,lib/,tests/helpers/'
+    gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
+
+# Example 5: Mix of files and directories
+- uses: Pradyumn-cloud/Verita@v4.0.3
+  with:
+    paths: 'main.py,src/models/,lib/utils.py'
+    gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
+```
+
+**⚠️ Important Notes:**
+- Use **commas without spaces** to separate paths: ✅ `src/,lib/` ❌ `src/, lib/`
+- Directories are processed recursively (all subdirectories included)
+- Only `.py` files are processed; other files are automatically skipped
+- Output files are named `test_<original_filename>.py`
+
+---
+
+### 🔐 Requirements & Permissions
+
+**Required:**
+- `GEMINI_API_KEY` secret must be configured in repository settings
+- Get your FREE API key at: https://aistudio.google.com/app/apikey
+
+**Permissions:**
+- Standard GitHub Actions permissions are sufficient
+- No special repository permissions needed
+
+---
+
+### ▶️ Try It in This Repository
+
+This repo includes example workflows you can test:
+
+1. Go to the **[Actions](../../actions)** tab
+2. Select **"Smart Test Generator"** workflow
+3. Click **"Run workflow"**
+4. Enter paths (try: `examples/calculator.py` or `examples/`)
+5. Click **"Run workflow"** button
+6. Wait for completion and download the `ai-generated-tests` artifact
+
+You can test all these scenarios:
+- `examples/calculator.py` - Single file
+- `examples/` - Entire directory
+- `smart_test/analyzer.py,smart_test/generator.py` - Multiple files
 
 ---
 
