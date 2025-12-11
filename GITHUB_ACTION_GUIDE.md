@@ -1,8 +1,8 @@
-# 🚀 GitHub Action Installation Guide
+# GitHub Action Installation Guide
 
 Perfect copy-paste ready examples for using Verita in your GitHub workflows!
 
-## 📦 Quick Setup (3 Steps)
+## Quick Setup (3 Steps)
 
 ### Step 1: Get Your FREE Gemini API Key
 Get your key at: https://aistudio.google.com/app/apikey
@@ -37,9 +37,9 @@ jobs:
       - name: Generate AI Tests
         uses: Pradyumn-cloud/Verita@v4.0.1
         with:
-          paths: 'src/'  # 📁 Change to your source directory
+          paths: 'src/'  # Change to your source directory
           gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-          model: 'models/gemini-2.0-flash'  # ⚡ Fast & recommended
+          model: 'models/gemini-2.0-flash'  # Fast & recommended
           framework: 'pytest'  # or 'unittest'
           output-dir: 'generated-tests'
       
@@ -52,7 +52,7 @@ jobs:
 
 ---
 
-## 🎯 Usage Examples
+## Usage Examples
 
 ### Basic Usage - Single Directory
 ```yaml
@@ -84,7 +84,7 @@ jobs:
   with:
     paths: 'src/'
     gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-    model: 'models/gemini-pro-latest'  # 🎯 Most capable
+    model: 'models/gemini-pro-latest'  # Most capable
 ```
 
 ### Custom Output & Framework
@@ -111,17 +111,7 @@ jobs:
 
 ---
 
-## 🤖 Available Models
-
-| Model | Speed | Capability | Best For |
-|-------|-------|------------|----------|
-| `models/gemini-2.0-flash` | ⚡⚡⚡ Fast | Good | Quick tests, large projects (default) |
-| `models/gemini-2.5-flash` | ⚡⚡ Fast | Better | Latest features, balanced performance |
-| `models/gemini-pro-latest` | ⚡ Moderate | 🎯 Best | Complex code, comprehensive tests |
-
----
-
-## 📋 Complete Example Workflow
+## Complete Example Workflow
 
 ```yaml
 name: AI Test Generation
@@ -168,7 +158,7 @@ jobs:
       
       - name: Display Summary
         run: |
-          echo "## 🧪 Test Generation Complete!" >> $GITHUB_STEP_SUMMARY
+          echo "## Test Generation Complete!" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Generated tests saved to: \`generated-tests/\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -178,7 +168,7 @@ jobs:
 
 ---
 
-## 🎓 Tips & Best Practices
+## Tips & Best Practices
 
 1. **Start with the default model** (`models/gemini-2.0-flash`) - it's fast and efficient
 2. **Use comma-separated paths** to generate tests for multiple specific files
@@ -188,7 +178,7 @@ jobs:
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -203,7 +193,7 @@ jobs:
 
 ---
 
-## 📚 More Examples
+## More Examples
 
 ### Generate Tests on Every Push
 ```yaml
@@ -243,4 +233,4 @@ on:
 
 ---
 
-Made with ❤️ by Pradyumn
+Made by Pradyumn
